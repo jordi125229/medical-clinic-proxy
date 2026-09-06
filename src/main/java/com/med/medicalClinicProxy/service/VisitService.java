@@ -16,33 +16,26 @@ public class VisitService {
     private final MedicalClinicClient medicalClinicClient;
 
     public PageableDto<VisitDto> getVisitsForPatient(int page, int size, String email) {
-        PageableDto<VisitDto> visits = getVisitDtoPage(page, size);
-        List<VisitDto> visitListForPatient = visits.getContent().stream()
-                .filter(visitDto -> visitDto.getPatientEmail().equalsIgnoreCase(email))
-                .toList();
-        visits.setContent(visitListForPatient);
-        return visits;
+        return medicalClinicClient.getVisitsForPatient(page, size, email);
+    }
+
+    public PageableDto<VisitDto> getVisitsForDoctor(int page, int size, String doctorEmail) {
+        return medicalClinicClient.getVisitsForDoctor(page, size, doctorEmail);
     }
 
     public PageableDto<VisitDto> getAvailableVisitsForDoctor(int page, int size, String doctorEmail) {
-        PageableDto<VisitDto> visits = getVisitDtoPage(page, size);
-        List<model.VisitDto> visitListForDoctor = visits.getContent().stream()
-                .filter(visit -> visit.getDoctorEmail().equalsIgnoreCase(doctorEmail))
-                .filter(visit -> visit.getPatientEmail() == null)
-                .toList();
-        visits.setContent(visitListForDoctor);
-        return visits;
+        return medicalClinicClient.getAvailableVisitsForDoctor(page, size, doctorEmail);
     }
 
-    public PageableDto<VisitDto> getVisitsForDayByDoctorSpecialization(int page, int size, LocalDate day, String doctorSpecialization){
+    public PageableDto<VisitDto> getVisitsForDayByDoctorSpecialization(int page, int size, LocalDate day, String doctorSpecialization) {
         return medicalClinicClient.getVisitsForDayByDoctorSpecialization(page, size, day, doctorSpecialization);
     }
 
-    public VisitDto assignPatientToVisit(String patientEmail, String visitId) {  // tu trzeba przetestowac
+    public VisitDto assignPatientToVisit(String patientEmail, String visitId) {
         return medicalClinicClient.assignPatientToVisit(patientEmail, visitId);
     }
 
-    private PageableDto<VisitDto> getVisitDtoPage(int page, int size) {
-        return medicalClinicClient.getVisits(page, size);
-    }
+//    public String cancelVisit(String doctorEmail, String visitId) {
+//
+//    }
 }

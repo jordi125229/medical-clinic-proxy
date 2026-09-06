@@ -32,12 +32,13 @@ public class MedicalClinicClientTest {
     @Test
     void getVisits_DataCorrect_VisitsReturned() throws Exception {
         // given
-        stubFor(get(urlPathEqualTo("/visits"))
+        stubFor(get(urlPathEqualTo("/visits/patient"))
                 .withQueryParam("page", equalTo("0"))
                 .withQueryParam("size", equalTo("1"))
+                .withQueryParam("email", equalTo("patient email"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBodyFile("/medical_client_response.json")));
+                        .withBodyFile("medical_client_response.json")));
 
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.get("/visits/patient")
@@ -52,17 +53,19 @@ public class MedicalClinicClientTest {
                 .andExpect(jsonPath("$.content[0].doctorEmail").value("doctor email"))
                 .andExpect(jsonPath("$.content[0].patientEmail").value("patient email"));
 
-        verify(1, getRequestedFor(urlPathEqualTo("/visits"))
+        verify(1, getRequestedFor(urlPathEqualTo("/visits/patient"))
                 .withQueryParam("page", equalTo("0"))
-                .withQueryParam("size", equalTo("1")));
+                .withQueryParam("size", equalTo("1"))
+                .withQueryParam("email", equalTo("patient email")));
     }
 
     @Test
     void getVisitsForDoctor_DataCorrect_VisitsReturned() throws Exception {
         // given
-        stubFor(get(urlPathEqualTo("/visits"))
+        stubFor(get(urlPathEqualTo("/visits/doctor"))
                 .withQueryParam("page", equalTo("0"))
                 .withQueryParam("size", equalTo("1"))
+                .withQueryParam("email", equalTo("doctor email"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBodyFile("medical_client_response_available_visits.json")));
@@ -80,47 +83,40 @@ public class MedicalClinicClientTest {
                 .andExpect(jsonPath("$.content[0].doctorEmail").value("doctor email"))
                 .andExpect(jsonPath("$.content[0].patientEmail").doesNotExist());
 
-        verify(1, getRequestedFor(urlPathEqualTo("/visits"))
+        verify(1, getRequestedFor(urlPathEqualTo("/visits/doctor"))
                 .withQueryParam("page", equalTo("0"))
-                .withQueryParam("size", equalTo("1")));
+                .withQueryParam("size", equalTo("1"))
+                .withQueryParam("email", equalTo("doctor email")));
     }
 
     @Test
-    void getVisitsForDayByDoctorSpecialization_DataCorrect_VisitsReturned() throws Exception {
+    void getAvailableVisitsForDoctor_DataCorrect_VisitsReturned() throws Exception {
         // given
-        int page = 0;
-        int size = 1;
-        LocalDate day = LocalDate.of(2025, 12, 4);
-        String doctorSpecialization = "cardiologist";
-
-        stubFor(get(urlPathEqualTo("/by-doctor-specialization"))
+        stubFor(get(urlPathEqualTo("/visits/doctor/available"))
                 .withQueryParam("page", equalTo("0"))
                 .withQueryParam("size", equalTo("1"))
-                .withQueryParam("day", equalTo(("2025-12-04")))
-                .withQueryParam("doctorSpecialization", equalTo("cardiologist"))
+                .withQueryParam("email", equalTo("doctor email"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBodyFile("medical_client_response.json")));
+                        .withBodyFile("medical_client_response_available_visits.json")));
 
         // when & then
-        mockMvc.perform(MockMvcRequestBuilders.get("/visits/doctor/day")
-                        .param("page", String.valueOf(page))
-                        .param("size", String.valueOf(size))
-                        .param("day", day.toString())
-                        .param("doctorSpecialization", doctorSpecialization)
+        mockMvc.perform(MockMvcRequestBuilders.get("/visits/doctor/available")
+                        .param("page", "0")
+                        .param("size", "1")
+                        .param("doctorEmail", "doctor email")
                         .contentType(String.valueOf(MediaType.APPLICATION_JSON)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.pageNumber").value(page))
-                .andExpect(jsonPath("$.pageSize").value(size))
+                .andExpect(jsonPath("$.pageNumber").value(0))
+                .andExpect(jsonPath("$.pageSize").value(1))
                 .andExpect(jsonPath("$.total").value(1))
                 .andExpect(jsonPath("$.content[0].doctorEmail").value("doctor email"))
-                .andExpect(jsonPath("$.content[0].patientEmail").value("patient email"));
+                .andExpect(jsonPath("$.content[0].patientEmail").doesNotExist());
 
-        verify(1, getRequestedFor(urlPathEqualTo("/by-doctor-specialization"))
+        verify(1, getRequestedFor(urlPathEqualTo("/visits/doctor/available"))
                 .withQueryParam("page", equalTo("0"))
                 .withQueryParam("size", equalTo("1"))
-                .withQueryParam("day", equalTo("2025-12-04"))
-                .withQueryParam("doctorSpecialization", equalTo("cardiologist")));
+                .withQueryParam("email", equalTo("doctor email")));
     }
 
     @Test

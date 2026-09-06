@@ -1,4 +1,5 @@
 package com.med.medicalClinicProxy.service;
+
 import com.med.medicalClinicProxy.client.MedicalClinicClient;
 import model.PageableDto;
 import model.VisitDto;
@@ -14,8 +15,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -35,9 +36,11 @@ public class VisitServiceTest {
         // given
         int pageNumber = 0;
         int pageSize = 1;
+        String patientEmail = "patient email";
+
         VisitDto visit = VisitDto.builder()
                 .doctorEmail("doctor email")
-                .patientEmail("patient email")
+                .patientEmail(patientEmail)
                 .visitStart(LocalDateTime.of(2025, 12, 4, 10, 0))
                 .visitEnd(LocalDateTime.of(2025, 12, 4, 10, 30))
                 .build();
@@ -45,18 +48,20 @@ public class VisitServiceTest {
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
         List<VisitDto> visits = List.of(visit);
         Page<VisitDto> pageVisit = new PageImpl<>(visits, pageRequest, visits.size());
+
         PageableDto<VisitDto> pageableDto = PageableDto.create(visits, pageVisit);
-        when(medicalClinicClient.getVisits(pageNumber, pageSize)).thenReturn(pageableDto);
+        when(medicalClinicClient.getVisitsForPatient(pageNumber, pageSize, patientEmail)).thenReturn(pageableDto);
 
         // when
-        PageableDto<VisitDto> pageableVisitDtoForPatient = visitService.getVisitsForPatient(pageNumber, pageSize, "patient email");
+        PageableDto<VisitDto> result = visitService.getVisitsForPatient(pageNumber, pageSize, patientEmail);
 
         // then
         assertAll(
-                () -> assertEquals(1, pageableVisitDtoForPatient.getTotalPages()),
-                () -> assertEquals("patient email", pageableVisitDtoForPatient.getContent().getFirst().getPatientEmail()),
-                () -> assertEquals(visits, pageableVisitDtoForPatient.getContent())
-        );
+                () -> assertEquals(1, result.getTotalPages()),
+                () -> assertEquals(patientEmail, result.getContent().getFirst().getPatientEmail()),
+                () -> assertEquals(visits, result.getContent()));
+
+        verify(medicalClinicClient).getVisitsForPatient(pageNumber, pageSize, patientEmail);
     }
 
     @Test
@@ -64,8 +69,10 @@ public class VisitServiceTest {
         // given
         int pageNumber = 0;
         int pageSize = 1;
+        String doctorEmail = "doctor email";
+
         VisitDto visit = VisitDto.builder()
-                .doctorEmail("doctor email")
+                .doctorEmail(doctorEmail)
                 .patientEmail(null)
                 .visitStart(LocalDateTime.of(2025, 12, 4, 10, 0))
                 .visitEnd(LocalDateTime.of(2025, 12, 4, 10, 30))
@@ -75,16 +82,56 @@ public class VisitServiceTest {
         List<VisitDto> visits = List.of(visit);
         Page<VisitDto> pageVisit = new PageImpl<>(visits, pageRequest, visits.size());
         PageableDto<VisitDto> pageableDto = PageableDto.create(visits, pageVisit);
-        when(medicalClinicClient.getVisits(pageNumber, pageSize)).thenReturn(pageableDto);
+
+        when(medicalClinicClient.getVisitsForDoctor(pageNumber, pageSize, doctorEmail)).thenReturn(pageableDto);
 
         // when
-        PageableDto<VisitDto> pageableVisitDtoForDoctor = visitService.getAvailableVisitsForDoctor(pageNumber, pageSize, "doctor email");
+        PageableDto<VisitDto> result =
+                visitService.getVisitsForDoctor(pageNumber, pageSize, doctorEmail);
 
         // then
         assertAll(
-                () -> assertEquals(1, pageableVisitDtoForDoctor.getTotalPages()),
-                () -> assertEquals("doctor email", pageableVisitDtoForDoctor.getContent().getFirst().getDoctorEmail()),
-                () -> assertEquals(visits, pageableVisitDtoForDoctor.getContent()));
+                () -> assertEquals(1, result.getTotalPages()),
+                () -> assertEquals(doctorEmail, result.getContent().getFirst().getDoctorEmail()),
+                () -> assertEquals(visits, result.getContent())
+        );
+
+        verify(medicalClinicClient).getVisitsForDoctor(pageNumber, pageSize, doctorEmail);
+    }
+
+    @Test
+    void getAvailableVisitsForDoctor_DataCorrect_AvailableVisitsReturned() {
+        // given
+        int pageNumber = 0;
+        int pageSize = 1;
+        String doctorEmail = "doctor email";
+
+        VisitDto visit = VisitDto.builder()
+                .doctorEmail(doctorEmail)
+                .patientEmail(null)
+                .visitStart(LocalDateTime.of(2025, 12, 4, 10, 0))
+                .visitEnd(LocalDateTime.of(2025, 12, 4, 10, 30))
+                .build();
+
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+        List<VisitDto> visits = List.of(visit);
+        Page<VisitDto> pageVisit = new PageImpl<>(visits, pageRequest, visits.size());
+        PageableDto<VisitDto> pageableDto = PageableDto.create(visits, pageVisit);
+
+        when(medicalClinicClient.getAvailableVisitsForDoctor(pageNumber, pageSize, doctorEmail)).thenReturn(pageableDto);
+
+        // when
+        PageableDto<VisitDto> result = visitService.getAvailableVisitsForDoctor(pageNumber, pageSize, doctorEmail);
+
+        // then
+        assertAll(
+                () -> assertEquals(1, result.getTotalPages()),
+                () -> assertEquals(doctorEmail, result.getContent().getFirst().getDoctorEmail()),
+                () -> assertNull(result.getContent().getFirst().getPatientEmail()),
+                () -> assertEquals(visits, result.getContent())
+        );
+
+        verify(medicalClinicClient).getAvailableVisitsForDoctor(pageNumber, pageSize, doctorEmail);
     }
 
     @Test
@@ -120,7 +167,7 @@ public class VisitServiceTest {
     }
 
     @Test
-    void assignPatientToVisit_DataCorrect_PatientAssigned(){
+    void assignPatientToVisit_DataCorrect_PatientAssigned() {
         // given
         VisitDto visit = VisitDto.builder()
                 .doctorEmail("doctor email")

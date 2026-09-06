@@ -26,6 +26,21 @@ public class FallBackMedicalClinicProxy implements FallbackFactory<MedicalClinic
             }
 
             @Override
+            public PageableDto<VisitDto> getVisitsForPatient(int page, int size, String email) {
+                throw new MedicalClinicException("Medical clinic app is not available now.");
+            }
+
+            @Override
+            public PageableDto<VisitDto> getVisitsForDoctor(int page, int size, String email) {
+                throw new MedicalClinicException("Medical clinic app is not available now.");
+            }
+
+            @Override
+            public PageableDto<VisitDto> getAvailableVisitsForDoctor(int page, int size, String email) {
+                throw new MedicalClinicException("Medical clinic app is not available now.");
+            }
+
+            @Override
             public VisitDto assignPatientToVisit(String email, String visitId) {
                 throw new MedicalClinicException("Medical clinic app is not available now.");
             }
