@@ -78,7 +78,7 @@ public class VisitControllerTest {
         Page<VisitDto> pageVisit = new PageImpl<>(visits, pageRequest, visits.size());
         PageableDto<VisitDto> pageableVisitDto = PageableDto.create(visits, pageVisit);
 
-        when(visitService.getVisitsForDoctor(anyInt(), anyInt(), anyString())).thenReturn(pageableVisitDto);
+        when(visitService.getAvailableVisitsForDoctor(anyInt(), anyInt(), anyString())).thenReturn(pageableVisitDto);
 
         // when & then
         mockMvc.perform(get("/visits/doctor")

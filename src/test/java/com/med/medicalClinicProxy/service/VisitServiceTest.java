@@ -66,7 +66,7 @@ public class VisitServiceTest {
         int pageSize = 1;
         VisitDto visit = VisitDto.builder()
                 .doctorEmail("doctor email")
-                .patientEmail("patient email")
+                .patientEmail(null)
                 .visitStart(LocalDateTime.of(2025, 12, 4, 10, 0))
                 .visitEnd(LocalDateTime.of(2025, 12, 4, 10, 30))
                 .build();
@@ -78,7 +78,7 @@ public class VisitServiceTest {
         when(medicalClinicClient.getVisits(pageNumber, pageSize)).thenReturn(pageableDto);
 
         // when
-        PageableDto<VisitDto> pageableVisitDtoForDoctor = visitService.getVisitsForDoctor(pageNumber, pageSize, "doctor email");
+        PageableDto<VisitDto> pageableVisitDtoForDoctor = visitService.getAvailableVisitsForDoctor(pageNumber, pageSize, "doctor email");
 
         // then
         assertAll(

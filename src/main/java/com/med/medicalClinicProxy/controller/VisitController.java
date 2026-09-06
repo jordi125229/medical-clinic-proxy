@@ -22,10 +22,10 @@ public class VisitController {
     }
 
     @GetMapping("/doctor")
-    public PageableDto<VisitDto> getVisitsForDoctor(@RequestParam int page, @RequestParam int size,
-                                                    @RequestParam String doctorEmail) {
+    public PageableDto<VisitDto> getAvailableVisitsForDoctor(@RequestParam int page, @RequestParam int size,
+                                                             @RequestParam String doctorEmail) {
         log.info("Getting visit's list for doctor");
-        return visitService.getVisitsForDoctor(page, size, doctorEmail);
+        return visitService.getAvailableVisitsForDoctor(page, size, doctorEmail);
     }
 
     @GetMapping("/doctor/day")

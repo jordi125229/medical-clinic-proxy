@@ -65,7 +65,7 @@ public class MedicalClinicClientTest {
                 .withQueryParam("size", equalTo("1"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withBodyFile("medical_client_response.json")));
+                        .withBodyFile("medical_client_response_available_visits.json")));
 
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.get("/visits/doctor")
@@ -78,7 +78,7 @@ public class MedicalClinicClientTest {
                 .andExpect(jsonPath("$.pageSize").value(1))
                 .andExpect(jsonPath("$.total").value(1))
                 .andExpect(jsonPath("$.content[0].doctorEmail").value("doctor email"))
-                .andExpect(jsonPath("$.content[0].patientEmail").value("patient email"));
+                .andExpect(jsonPath("$.content[0].patientEmail").doesNotExist());
 
         verify(1, getRequestedFor(urlPathEqualTo("/visits"))
                 .withQueryParam("page", equalTo("0"))
