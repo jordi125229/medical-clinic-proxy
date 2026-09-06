@@ -7,7 +7,7 @@ import model.VisitDto;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -27,15 +27,24 @@ public class VisitService {
         return medicalClinicClient.getAvailableVisitsForDoctor(page, size, doctorEmail);
     }
 
+    public PageableDto<VisitDto> getVisitsByDoctorSpecialization(int page, int size, String doctorSpecialization) {
+        return medicalClinicClient.getVisitsByDoctorSpecialization(page, size, doctorSpecialization);
+    }
+
     public PageableDto<VisitDto> getVisitsForDayByDoctorSpecialization(int page, int size, LocalDate day, String doctorSpecialization) {
         return medicalClinicClient.getVisitsForDayByDoctorSpecialization(page, size, day, doctorSpecialization);
+    }
+
+    public PageableDto<VisitDto> getAvailableVisitsByPeriod(int page, int size, LocalDateTime start, LocalDateTime end, String specialization) {
+        return medicalClinicClient.getAvailableVisitsByPeriod(page, size, start, end, specialization);
     }
 
     public VisitDto assignPatientToVisit(String patientEmail, String visitId) {
         return medicalClinicClient.assignPatientToVisit(patientEmail, visitId);
     }
 
-//    public String cancelVisit(String doctorEmail, String visitId) {
-//
-//    }
+    public String cancelVisit(String visitId) {
+        medicalClinicClient.deleteVisit(visitId);
+        return "Visit deleted";
+    }
 }

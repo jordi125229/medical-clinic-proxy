@@ -9,6 +9,7 @@ import model.VisitDto;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -41,12 +42,27 @@ public class FallBackMedicalClinicProxy implements FallbackFactory<MedicalClinic
             }
 
             @Override
+            public PageableDto<VisitDto> getVisitsByDoctorSpecialization(int page, int size, String doctorSpecialization) {
+                throw new MedicalClinicException("Medical clinic app is not available now.");
+            }
+
+            @Override
             public VisitDto assignPatientToVisit(String email, String visitId) {
                 throw new MedicalClinicException("Medical clinic app is not available now.");
             }
 
             @Override
+            public void deleteVisit(String visitId) {
+
+            }
+
+            @Override
             public PageableDto<VisitDto> getVisitsForDayByDoctorSpecialization(int page, int size, LocalDate day, String doctorSpecialization) {
+                throw new MedicalClinicException("Medical clinic app is not available now.");
+            }
+
+            @Override
+            public PageableDto<VisitDto> getAvailableVisitsByPeriod(int page, int size, LocalDateTime start, LocalDateTime end, String specialization) {
                 throw new MedicalClinicException("Medical clinic app is not available now.");
             }
         };

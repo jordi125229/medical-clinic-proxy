@@ -16,5 +16,4 @@ public class ClinicDto {
     private String postalCode;
     private String street;
     private String number;
-    private List<DoctorDto> doctorsDto;
 }
