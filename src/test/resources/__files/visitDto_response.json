@@ -1,0 +1,15 @@
+{
+  "id": 1,
+  "clinicDto": {
+    "clinicId": 1,
+    "name": "Klinika X",
+    "city": "Warszawa",
+    "postalCode": "00-001",
+    "street": "Marszałkowska",
+    "number": "10A"
+  },
+  "doctorEmail": "doctor email",
+  "visitStart": "2026-06-25T10:30:00",
+  "visitEnd": "2026-06-25T10:45:00",
+  "patientEmail": "patient email"
+}
